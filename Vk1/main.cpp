@@ -13,6 +13,7 @@
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
+
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
@@ -29,6 +30,7 @@
 #include <unordered_map>
 
 #include "validationLayers.h"
+#include "vertex.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -67,45 +69,45 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
-struct Vertex {
-    glm::vec3 pos;
-    glm::vec3 color;
-    glm::vec2 texCoord;
-
-    static VkVertexInputBindingDescription getBindingDescription() {
-        VkVertexInputBindingDescription bindingDescription{};
-        bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(Vertex);
-        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-        return bindingDescription;
-    }
-
-    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
-        std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
-
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-        attributeDescriptions[2].binding = 0;
-        attributeDescriptions[2].location = 2;
-        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
-
-        return attributeDescriptions;
-    }
-
-    bool operator==(const Vertex& other) const {
-        return pos == other.pos && color == other.color && texCoord == other.texCoord;
-    }
-};
+//struct Vertex {
+//    glm::vec3 pos;
+//    glm::vec3 color;
+//    glm::vec2 texCoord;
+//
+//    static VkVertexInputBindingDescription getBindingDescription() {
+//        VkVertexInputBindingDescription bindingDescription{};
+//        bindingDescription.binding = 0;
+//        bindingDescription.stride = sizeof(Vertex);
+//        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+//
+//        return bindingDescription;
+//    }
+//
+//    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
+//        std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
+//
+//        attributeDescriptions[0].binding = 0;
+//        attributeDescriptions[0].location = 0;
+//        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+//        attributeDescriptions[0].offset = offsetof(Vertex, pos);
+//
+//        attributeDescriptions[1].binding = 0;
+//        attributeDescriptions[1].location = 1;
+//        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+//        attributeDescriptions[1].offset = offsetof(Vertex, color);
+//
+//        attributeDescriptions[2].binding = 0;
+//        attributeDescriptions[2].location = 2;
+//        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+//        attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
+//
+//        return attributeDescriptions;
+//    }
+//
+//    bool operator==(const Vertex& other) const {
+//        return pos == other.pos && color == other.color && texCoord == other.texCoord;
+//    }
+//};
 
 namespace std {
     template<> struct hash<Vertex> {
@@ -123,17 +125,17 @@ struct UniformBufferObject {
 
 class HelloTriangleApplication {
 
- //     ___           ___           ___           ___                         ___           ___           ___                         ___           ___     
- //    /\__\         /\  \         /\  \         /\__\                       /\  \         /\  \         /\__\                       /\  \         /\  \    
- //   /:/  /        /::\  \        \:\  \       /:/ _/_         ___         /::\  \        \:\  \       /:/  /          ___         /::\  \       /::\  \   
- //  /:/  /        /:/\:\  \        \:\  \     /:/ /\  \       /\__\       /:/\:\__\        \:\  \     /:/  /          /\__\       /:/\:\  \     /:/\:\__\  
- // /:/  /  ___   /:/  \:\  \   _____\:\  \   /:/ /::\  \     /:/  /      /:/ /:/  /    ___  \:\  \   /:/  /  ___     /:/  /      /:/  \:\  \   /:/ /:/  /  
- ///:/__/  /\__\ /:/__/ \:\__\ /::::::::\__\ /:/_/:/\:\__\   /:/__/      /:/_/:/__/___ /\  \  \:\__\ /:/__/  /\__\   /:/__/      /:/__/ \:\__\ /:/_/:/__/___
- //\:\  \ /:/  / \:\  \ /:/  / \:\~~\~~\/__/ \:\/:/ /:/  /  /::\  \      \:\/:::::/  / \:\  \ /:/  / \:\  \ /:/  /  /::\  \      \:\  \ /:/  / \:\/:::::/  /
- // \:\  /:/  /   \:\  /:/  /   \:\  \        \::/ /:/  /  /:/\:\  \      \::/~~/~~~~   \:\  /:/  /   \:\  /:/  /  /:/\:\  \      \:\  /:/  /   \::/~~/~~~~ 
- //  \:\/:/  /     \:\/:/  /     \:\  \        \/_/:/  /   \/__\:\  \      \:\~~\        \:\/:/  /     \:\/:/  /   \/__\:\  \      \:\/:/  /     \:\~~\     
- //   \::/  /       \::/  /       \:\__\         /:/  /         \:\__\      \:\__\        \::/  /       \::/  /         \:\__\      \::/  /       \:\__\    
- //    \/__/         \/__/         \/__/         \/__/           \/__/       \/__/         \/__/         \/__/           \/__/       \/__/         \/__/    
+    //     ___           ___           ___           ___                         ___           ___           ___                         ___           ___     
+    //    /\__\         /\  \         /\  \         /\__\                       /\  \         /\  \         /\__\                       /\  \         /\  \    
+    //   /:/  /        /::\  \        \:\  \       /:/ _/_         ___         /::\  \        \:\  \       /:/  /          ___         /::\  \       /::\  \   
+    //  /:/  /        /:/\:\  \        \:\  \     /:/ /\  \       /\__\       /:/\:\__\        \:\  \     /:/  /          /\__\       /:/\:\  \     /:/\:\__\  
+    // /:/  /  ___   /:/  \:\  \   _____\:\  \   /:/ /::\  \     /:/  /      /:/ /:/  /    ___  \:\  \   /:/  /  ___     /:/  /      /:/  \:\  \   /:/ /:/  /  
+    ///:/__/  /\__\ /:/__/ \:\__\ /::::::::\__\ /:/_/:/\:\__\   /:/__/      /:/_/:/__/___ /\  \  \:\__\ /:/__/  /\__\   /:/__/      /:/__/ \:\__\ /:/_/:/__/___
+    //\:\  \ /:/  / \:\  \ /:/  / \:\~~\~~\/__/ \:\/:/ /:/  /  /::\  \      \:\/:::::/  / \:\  \ /:/  / \:\  \ /:/  /  /::\  \      \:\  \ /:/  / \:\/:::::/  /
+    // \:\  /:/  /   \:\  /:/  /   \:\  \        \::/ /:/  /  /:/\:\  \      \::/~~/~~~~   \:\  /:/  /   \:\  /:/  /  /:/\:\  \      \:\  /:/  /   \::/~~/~~~~ 
+    //  \:\/:/  /     \:\/:/  /     \:\  \        \/_/:/  /   \/__\:\  \      \:\~~\        \:\/:/  /     \:\/:/  /   \/__\:\  \      \:\/:/  /     \:\~~\     
+    //   \::/  /       \::/  /       \:\__\         /:/  /         \:\__\      \:\__\        \::/  /       \::/  /         \:\__\      \::/  /       \:\__\    
+    //    \/__/         \/__/         \/__/         \/__/           \/__/       \/__/         \/__/         \/__/           \/__/       \/__/         \/__/    
 public:
     void run() {
         initWindow();
@@ -148,17 +150,17 @@ public:
     ~HelloTriangleApplication() {
         delete vl;
     }
- //                   ___           ___                       ___                                       ___           ___     
- //     ___          /\  \         /\  \                     /\  \         _____                       /\__\         /\__\    
- //    /\  \        /::\  \       /::\  \       ___         /::\  \       /::\  \                     /:/ _/_       /:/ _/_   
- //    \:\  \      /:/\:\  \     /:/\:\__\     /\__\       /:/\:\  \     /:/\:\  \                   /:/ /\__\     /:/ /\  \  
- //     \:\  \    /:/ /::\  \   /:/ /:/  /    /:/__/      /:/ /::\  \   /:/ /::\__\   ___     ___   /:/ /:/ _/_   /:/ /::\  \ 
- // ___  \:\__\  /:/_/:/\:\__\ /:/_/:/__/___ /::\  \     /:/_/:/\:\__\ /:/_/:/\:|__| /\  \   /\__\ /:/_/:/ /\__\ /:/_/:/\:\__\
- ///\  \ |:|  |  \:\/:/  \/__/ \:\/:::::/  / \/\:\  \__  \:\/:/  \/__/ \:\/:/ /:/  / \:\  \ /:/  / \:\/:/ /:/  / \:\/:/ /:/  /
- //\:\  \|:|  |   \::/__/       \::/~~/~~~~   ~~\:\/\__\  \::/__/       \::/_/:/  /   \:\  /:/  /   \::/_/:/  /   \::/ /:/  / 
- // \:\__|:|__|    \:\  \        \:\~~\          \::/  /   \:\  \        \:\/:/  /     \:\/:/  /     \:\/:/  /     \/_/:/  /  
- //  \::::/__/      \:\__\        \:\__\         /:/  /     \:\__\        \::/  /       \::/  /       \::/  /        /:/  /   
- //   ~~~~           \/__/         \/__/         \/__/       \/__/         \/__/         \/__/         \/__/         \/__/    
+    //                   ___           ___                       ___                                       ___           ___     
+    //     ___          /\  \         /\  \                     /\  \         _____                       /\__\         /\__\    
+    //    /\  \        /::\  \       /::\  \       ___         /::\  \       /::\  \                     /:/ _/_       /:/ _/_   
+    //    \:\  \      /:/\:\  \     /:/\:\__\     /\__\       /:/\:\  \     /:/\:\  \                   /:/ /\__\     /:/ /\  \  
+    //     \:\  \    /:/ /::\  \   /:/ /:/  /    /:/__/      /:/ /::\  \   /:/ /::\__\   ___     ___   /:/ /:/ _/_   /:/ /::\  \ 
+    // ___  \:\__\  /:/_/:/\:\__\ /:/_/:/__/___ /::\  \     /:/_/:/\:\__\ /:/_/:/\:|__| /\  \   /\__\ /:/_/:/ /\__\ /:/_/:/\:\__\
+    ///\  \ |:|  |  \:\/:/  \/__/ \:\/:::::/  / \/\:\  \__  \:\/:/  \/__/ \:\/:/ /:/  / \:\  \ /:/  / \:\/:/ /:/  / \:\/:/ /:/  /
+    //\:\  \|:|  |   \::/__/       \::/~~/~~~~   ~~\:\/\__\  \::/__/       \::/_/:/  /   \:\  /:/  /   \::/_/:/  /   \::/ /:/  / 
+    // \:\__|:|__|    \:\  \        \:\~~\          \::/  /   \:\  \        \:\/:/  /     \:\/:/  /     \:\/:/  /     \/_/:/  /  
+    //  \::::/__/      \:\__\        \:\__\         /:/  /     \:\__\        \::/  /       \::/  /       \::/  /        /:/  /   
+    //   ~~~~           \/__/         \/__/         \/__/       \/__/         \/__/         \/__/         \/__/         \/__/    
 private:
     //-------------------------
     ValidationLayers* vl;
@@ -219,17 +221,17 @@ private:
     uint32_t currentFrame = 0;
 
     bool framebufferResized = false;
- //                 ___                                                 ___                                     ___           ___     
- //                /\  \                                               /\  \                                   /\__\         /\__\    
- //   ___          \:\  \       ___           ___         ___         /::\  \                     ___         /:/ _/_       /:/ _/_   
- //  /\__\          \:\  \     /\__\         /\__\       /\__\       /:/\:\  \                   /\__\       /:/ /\  \     /:/ /\__\  
- // /:/__/      _____\:\  \   /:/__/        /:/  /      /:/__/      /:/ /::\  \   ___     ___   /:/__/      /:/ /::\  \   /:/ /:/ _/_ 
- ///::\  \     /::::::::\__\ /::\  \       /:/__/      /::\  \     /:/_/:/\:\__\ /\  \   /\__\ /::\  \     /:/_/:/\:\__\ /:/_/:/ /\__\
- //\/\:\  \__  \:\~~\~~\/__/ \/\:\  \__   /::\  \      \/\:\  \__  \:\/:/  \/__/ \:\  \ /:/  / \/\:\  \__  \:\/:/ /:/  / \:\/:/ /:/  /
- // ~~\:\/\__\  \:\  \        ~~\:\/\__\ /:/\:\  \      ~~\:\/\__\  \::/__/       \:\  /:/  /   ~~\:\/\__\  \::/ /:/  /   \::/_/:/  / 
- //    \::/  /   \:\  \          \::/  / \/__\:\  \        \::/  /   \:\  \        \:\/:/  /       \::/  /   \/_/:/  /     \:\/:/  /  
- //    /:/  /     \:\__\         /:/  /       \:\__\       /:/  /     \:\__\        \::/  /        /:/  /      /:/  /       \::/  /   
- //    \/__/       \/__/         \/__/         \/__/       \/__/       \/__/         \/__/         \/__/       \/__/         \/__/    
+    //                 ___                                                 ___                                     ___           ___     
+    //                /\  \                                               /\  \                                   /\__\         /\__\    
+    //   ___          \:\  \       ___           ___         ___         /::\  \                     ___         /:/ _/_       /:/ _/_   
+    //  /\__\          \:\  \     /\__\         /\__\       /\__\       /:/\:\  \                   /\__\       /:/ /\  \     /:/ /\__\  
+    // /:/__/      _____\:\  \   /:/__/        /:/  /      /:/__/      /:/ /::\  \   ___     ___   /:/__/      /:/ /::\  \   /:/ /:/ _/_ 
+    ///::\  \     /::::::::\__\ /::\  \       /:/__/      /::\  \     /:/_/:/\:\__\ /\  \   /\__\ /::\  \     /:/_/:/\:\__\ /:/_/:/ /\__\
+    //\/\:\  \__  \:\~~\~~\/__/ \/\:\  \__   /::\  \      \/\:\  \__  \:\/:/  \/__/ \:\  \ /:/  / \/\:\  \__  \:\/:/ /:/  / \:\/:/ /:/  /
+    // ~~\:\/\__\  \:\  \        ~~\:\/\__\ /:/\:\  \      ~~\:\/\__\  \::/__/       \:\  /:/  /   ~~\:\/\__\  \::/ /:/  /   \::/_/:/  / 
+    //    \::/  /   \:\  \          \::/  / \/__\:\  \        \::/  /   \:\  \        \:\/:/  /       \::/  /   \/_/:/  /     \:\/:/  /  
+    //    /:/  /     \:\__\         /:/  /       \:\__\       /:/  /     \:\__\        \::/  /        /:/  /      /:/  /       \::/  /   
+    //    \/__/       \/__/         \/__/         \/__/       \/__/       \/__/         \/__/         \/__/       \/__/         \/__/    
     void initWindow() {
         glfwInit();
 
@@ -272,23 +274,22 @@ private:
         createCommandBuffers();
         createSyncObjects();
     }
- //     ___           ___                       ___     
- //    /\  \         /\  \                     /\  \    
- //   |::\  \       /::\  \       ___          \:\  \   
- //   |:|:\  \     /:/\:\  \     /\__\          \:\  \  
- // __|:|\:\  \   /:/ /::\  \   /:/__/      _____\:\  \ 
- ///::::|_\:\__\ /:/_/:/\:\__\ /::\  \     /::::::::\__\
- //\:\~~\  \/__/ \:\/:/  \/__/ \/\:\  \__  \:\~~\~~\/__/
- // \:\  \        \::/__/       ~~\:\/\__\  \:\  \      
- //  \:\  \        \:\  \          \::/  /   \:\  \     
- //   \:\__\        \:\__\         /:/  /     \:\__\    
- //    \/__/         \/__/         \/__/       \/__/    
+    //     ___           ___                       ___     
+    //    /\  \         /\  \                     /\  \    
+    //   |::\  \       /::\  \       ___          \:\  \   
+    //   |:|:\  \     /:/\:\  \     /\__\          \:\  \  
+    // __|:|\:\  \   /:/ /::\  \   /:/__/      _____\:\  \ 
+    ///::::|_\:\__\ /:/_/:/\:\__\ /::\  \     /::::::::\__\
+    //\:\~~\  \/__/ \:\/:/  \/__/ \/\:\  \__  \:\~~\~~\/__/
+    // \:\  \        \::/__/       ~~\:\/\__\  \:\  \      
+    //  \:\  \        \:\  \          \::/  /   \:\  \     
+    //   \:\__\        \:\__\         /:/  /     \:\__\    
+    //    \/__/         \/__/         \/__/       \/__/    
     void mainLoop() {
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
             drawFrame();
         }
-
         vkDeviceWaitIdle(device);
     }
 
